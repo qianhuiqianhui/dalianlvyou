@@ -1,0 +1,269 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小鱼和狒狒的辽宁之旅</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8f9fa;--text:#2d3436;--text2:#636e72;--accent:#0984e3;--accent2:#74b9ff;--border:#dfe6e9;--card:#fff;--success:#00b894;--danger:#d63031;--radius:15px}
+[data-theme="dark"]{--bg:#1a1a2e;--text:#e0e0e0;--text2:#a0a0a0;--accent:#4a90e2;--accent2:#2c3e50;--border:#2c3e50;--card:#1e272e;--success:#2ecc71;--danger:#e74c3c}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:20px;max-width:1200px;margin:0 auto}
+.header{text-align:center;margin-bottom:30px;padding:20px;background:var(--card);border-radius:var(--radius);box-shadow:0 4px 6px rgba(0,0,0,.1)}
+.header h1{font-size:2em;color:var(--accent);margin-bottom:10px}
+.countdown-card{background:linear-gradient(135deg,var(--accent),#6c5ce7);color:#fff;padding:25px;border-radius:var(--radius);margin-bottom:25px;text-align:center}
+.countdown-time{display:flex;justify-content:center;gap:15px;font-size:1.5em;font-weight:bold;flex-wrap:wrap}
+.countdown-unit{background:rgba(255,255,255,.2);padding:10px 15px;border-radius:10px;min-width:80px}
+.countdown-number{font-size:2em;display:block}
+.current-todo{margin-top:15px;padding:10px;background:rgba(255,255,255,.15);border-radius:8px}
+.section{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,.1)}
+.section-title{font-size:1.3em;margin-bottom:15px;color:var(--accent);border-bottom:2px solid var(--accent2);padding-bottom:10px}
+.day-selector{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.day-btn{padding:12px 20px;border:2px solid var(--border);background:var(--bg);color:var(--text);border-radius:10px;cursor:pointer;font-size:1em;transition:all .2s}
+.day-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.day-btn:hover{transform:translateY(-2px)}
+.day-content{display:none}
+.day-content.active{display:block}
+.day-legend{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;font-size:.85em;color:var(--text2)}
+.legend-dot{width:12px;height:12px;border-radius:50%;margin-right:5px}
+.timeline{position:relative;padding-left:30px}
+.timeline::before{content:"";position:absolute;left:15px;top:0;bottom:0;width:3px;background:var(--accent2)}
+.timeline-item{position:relative;margin-bottom:15px;padding:15px;background:var(--bg);border-radius:10px;border-left:4px solid var(--accent);cursor:pointer;transition:all .2s}
+.timeline-item:hover{transform:translateX(5px)}
+.timeline-item::before{content:"";position:absolute;left:-25px;top:20px;width:12px;height:12px;background:var(--accent);border-radius:50%;border:3px solid var(--bg)}
+.timeline-date{font-weight:bold;color:var(--accent)}
+.timeline-title{font-weight:bold;margin:5px 0}
+.timeline-detail{color:var(--text2);font-size:.95em}
+.timeline-map{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)}
+.timeline-map.show{display:block}
+.location-tag{display:inline-block;padding:5px 10px;margin:3px;background:var(--accent2);color:var(--accent);border-radius:15px;font-size:.85em;cursor:pointer;transition:all .2s}
+.location-tag:hover{background:var(--accent);color:#fff}
+.ticket-card{display:flex;align-items:center;padding:15px;margin-bottom:10px;background:var(--bg);border-radius:10px;border-left:4px solid var(--accent)}
+.outfit-card{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
+.outfit-person{padding:15px;background:var(--bg);border-radius:10px;text-align:center}
+.outfit-name{font-weight:bold;color:var(--accent);margin-bottom:10px}
+.todo-item{display:flex;align-items:center;padding:10px 15px;margin-bottom:8px;background:var(--bg);border-radius:8px;cursor:pointer}
+.todo-checkbox{width:20px;height:20px;border:2px solid var(--accent);border-radius:50%;margin-right:12px;display:flex;align-items:center;justify-content:center}
+.todo-item.completed .todo-checkbox{background:var(--success);border-color:var(--success)}
+.todo-item.completed .todo-text{text-decoration:line-through;color:var(--text2)}
+.todo-delete{color:var(--danger);cursor:pointer;opacity:0;margin-left:10px}
+.todo-item:hover .todo-delete{opacity:1}
+.todo-input-container{display:flex;margin-top:10px;gap:10px}
+.todo-input{flex:1;padding:10px;border:2px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)}
+.todo-btn{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer}
+.expense-item{display:flex;align-items:center;padding:10px;margin-bottom:8px;background:var(--bg);border-radius:8px}
+.expense-name{flex:1}
+.expense-amount{width:100px;text-align:right;font-weight:bold;color:var(--accent)}
+.expense-payer{width:80px;text-align:center}
+.expense-total{text-align:right;padding:15px;font-size:1.2em;font-weight:bold;color:var(--accent);border-top:2px solid var(--accent2)}
+.tip-card{padding:15px;background:var(--bg);border-radius:10px;border-left:4px solid var(--accent)}
+.tips-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
+.weather-card{display:flex;align-items:center;padding:15px;margin-bottom:10px;background:var(--bg);border-radius:10px}
+.weather-icon{font-size:2.5em;margin-right:15px}
+.weather-temp{font-size:1.8em;font-weight:bold;color:var(--accent)}
+.progress-bar{width:100%;height:20px;background:var(--border);border-radius:10px;overflow:hidden;margin-top:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#6c5ce7);transition:width .3s}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-content{background:var(--card);padding:25px;border-radius:var(--radius);max-width:500px;width:90%}
+.modal-input{width:100%;padding:10px;margin-bottom:10px;border:2px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text)}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-secondary{background:var(--text2);color:#fff}
+.tab-btn{padding:10px 20px;background:none;border:none;color:var(--text2);cursor:pointer;border-bottom:3px solid transparent}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--accent)}
+@media(max-width:768px){body{padding:10px}.outfit-card{grid-template-columns:1fr}.day-selector{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🐟 小鱼 &amp; 🐒 狒狒的辽宁之旅</h1>
+<p>大连 → 丹东 → 沈阳 | 2026年10月3日 - 10月9日</p>
+</div>
+<div class="countdown-card">
+<div id="countdown-label">距离出发还有</div>
+<div class="countdown-time">
+<div class="countdown-unit"><span class="countdown-number" id="days">00</span><span>天</span></div>
+<div class="countdown-unit"><span class="countdown-number" id="hours">00</span><span>时</span></div>
+<div class="countdown-unit"><span class="countdown-number" id="minutes">00</span><span>分</span></div>
+<div class="countdown-unit"><span class="countdown-number" id="seconds">00</span><span>秒</span></div>
+</div>
+<div class="current-todo"><strong>📋 当前待办：</strong><span id="next-todo">加载中...</span></div>
+</div>
+<div class="section">
+<div class="section-title">✈️ 已确认订单</div>
+<div class="ticket-card">✈️ 海南航空 HU7259 | 10月3日 06:55 广州→11:35 大连</div>
+<div class="ticket-card">✈️ 东方航空 MU6340 | 10月9日 21:30 沈阳→01:55+1 广州</div>
+<div class="ticket-card">🚄 高铁 D7753 | 10月5日 18:06 大连→丹东</div>
+<div class="ticket-card">🚄 高铁 D7680 | 10月7日 17:46 丹东→沈阳</div>
+<div class="ticket-card">🏨 徐园饭店 | 10月3日 1晚 ¥320.84</div>
+<div class="ticket-card">🏨 艾尚酒店 | 10月4日 1晚 ¥272.68</div>
+<div class="ticket-card">🏨 银杏园酒店 | 10月5-7日 2晚 ¥561</div>
+<div class="ticket-card">🏨 盛京里·禧漫 | 10月7-9日 2晚 ¥388.31</div>
+</div>
+<div class="section">
+<div class="section-title">📅 逐日行程</div>
+<div class="day-selector">
+<button class="day-btn active" onclick="showDay(1)">Day 1 (10.3)</button>
+<button class="day-btn" onclick="showDay(2)">Day 2 (10.4)</button>
+<button class="day-btn" onclick="showDay(3)">Day 3 (10.5)</button>
+<button class="day-btn" onclick="showDay(4)">Day 4 (10.6)</button>
+<button class="day-btn" onclick="showDay(5)">Day 5 (10.7)</button>
+<button class="day-btn" onclick="showDay(6)">Day 6 (10.8)</button>
+<button class="day-btn" onclick="showDay(7)">Day 7 (10.9)</button>
+</div>
+<div class="day-content active" id="day1">
+<div id="map-day1"></div>
+<div class="day-legend"><span class="legend-item"><span class="legend-dot" style="background:#FF6B6B"></span>Day 1 大连</span></div>
+<div class="timeline">
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">10月3日 周六</div><div class="timeline-title">广州→大连</div><div class="timeline-detail">✈️ 06:55广州白云T3起飞<br>✈️ 11:35到达大连周水子<br>🏨 12:30入住徐园饭店</div><div class="timeline-map" data-points="38.9140,121.6147,大连周水子机场;38.9200,121.6300,徐园饭店"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">下午</div><div class="timeline-title">东港商务区</div><div class="timeline-detail">📍 东港商务区、港湾广场<br>📍 16:00 菱角湾看海</div><div class="timeline-map" data-points="38.9200,121.6500,东港商务区;38.9150,121.6450,港湾广场;38.9100,121.6400,菱角湾"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">晚上</div><div class="timeline-title">星海广场夜景</div><div class="timeline-detail">🍽️ 18:00 喜鼎（海胆饺子）<br>📍 20:00 星海广场/跨海大桥</div><div class="timeline-map" data-points="38.8884,121.6052,星海广场;38.8722,121.5981,跨海大桥"></div></div>
+</div></div>
+<div class="day-content" id="day2">
+<div id="map-day2"></div>
+<div class="day-legend"><span class="legend-item"><span class="legend-dot" style="background:#4ECDC4"></span>Day 2 大连</span></div>
+<div class="timeline">
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">10月4日 周日</div><div class="timeline-title">大连市区</div><div class="timeline-detail">🏨 11:00 退房徐园饭店<br>🏨 14:00 转住艾尚酒店</div><div class="timeline-map" data-points="38.9200,121.6300,徐园饭店;38.9250,121.6200,艾尚酒店"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">下午</div><div class="timeline-title">市区打卡</div><div class="timeline-detail">📍 14:00 中山广场、岗东五街<br>📍 16:00 渔人码头</div><div class="timeline-map" data-points="38.9160,121.6200,中山广场;38.9120,121.6250,岗东五街;38.9050,121.6300,渔人码头"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">晚上</div><div class="timeline-title">美食之夜</div><div class="timeline-detail">🍽️ 18:00 品海楼/正黄旗（海肠捞饭）<br>🍽️ 20:00 大连商场（炒焖子、鸡架）</div><div class="timeline-map" data-points="38.9200,121.6150,品海楼;38.9180,121.6120,大连商场"></div></div>
+</div></div>
+<div class="day-content" id="day3">
+<div id="map-day3"></div>
+<div class="day-legend"><span class="legend-item"><span class="legend-dot" style="background:#FFE66D"></span>Day 3 大连→丹东</span></div>
+<div class="timeline">
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">10月5日 周一</div><div class="timeline-title">大连→丹东</div><div class="timeline-detail">🛒 07:30 马栏市场<br>📍 10:00 银沙滩、付家庄、小岗</div><div class="timeline-map" data-points="38.9000,121.5900,马栏市场;38.8800,121.5800,银沙滩;38.8750,121.5750,小岗"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">下午</div><div class="timeline-title">返程</div><div class="timeline-detail">🍽️ 12:30 韩城谷香<br>🏨 15:00 退房艾尚酒店<br>🚄 18:06 D7753 大连→丹东</div><div class="timeline-map" data-points="38.9250,121.6200,艾尚酒店;38.9300,121.6100,大连站"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">晚上</div><div class="timeline-title">丹东</div><div class="timeline-detail">🏨 20:30 入住银杏园酒店<br>🍽️ 21:00 老肥串烧烤/金刚海鲜烧烤</div><div class="timeline-map" data-points="40.1210,124.3947,丹东站;40.1180,124.3900,银杏园酒店"></div></div>
+</div></div>
+<div class="day-content" id="day4">
+<div id="map-day4"></div>
+<div class="day-legend"><span class="legend-item"><span class="legend-dot" style="background:#FF9F43"></span>Day 4 丹东</span></div>
+<div class="timeline">
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">10月6日 周二</div><div class="timeline-title">丹东全天</div><div class="timeline-detail">🍽️ 08:00 天福汤饭<br>📍 09:00 鸭绿江断桥、国门、19号界碑、一步跨</div><div class="timeline-map" data-points="40.1152,124.3890,鸭绿江断桥;40.1160,124.3900,国门;40.1170,124.3910,一步跨"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">下午</div><div class="timeline-title">边境探索</div><div class="timeline-detail">🍽️ 12:00 东港黄海大市场<br>📍 14:00 虎山长城、G228起点<br>📍 17:00 抗美援朝纪念馆</div><div class="timeline-map" data-points="40.2320,124.5090,虎山长城;40.1200,124.3800,抗美援朝纪念馆"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">晚上</div><div class="timeline-title">安东老街</div><div class="timeline-detail">🍽️ 19:00 安东老街逛吃</div><div class="timeline-map" data-points="40.1200,124.3850,安东老街"></div></div>
+</div></div>
+<div class="day-content" id="day5">
+<div id="map-day5"></div>
+<div class="day-legend"><span class="legend-item"><span class="legend-dot" style="background:#54A0FF"></span>Day 5 丹东→沈阳</span></div>
+<div class="timeline">
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">10月7日 周三</div><div class="timeline-title">丹东→沈阳</div><div class="timeline-detail">📍 09:00 毛岸英学校<br>🏨 11:00 退房银杏园酒店</div><div class="timeline-map" data-points="40.1250,124.3950,毛岸英学校;40.1180,124.3900,银杏园酒店"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">下午</div><div class="timeline-title">前往沈阳</div><div class="timeline-detail">🚄 17:46 D7680 丹东→沈阳<br>🏨 19:40 入住盛京里·禧漫</div><div class="timeline-map" data-points="40.1210,124.3947,丹东站;41.8057,123.4315,沈阳站;41.8000,123.4400,盛京里·禧漫"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">晚上</div><div class="timeline-title">沈阳初体验</div><div class="timeline-detail">🍽️ 20:30 西塔韩式美食<br>🧖 22:00 搓澡</div><div class="timeline-map" data-points="41.7900,123.4100,西塔美食街"></div></div>
+</div></div>
+<div class="day-content" id="day6">
+<div id="map-day6"></div>
+<div class="day-legend"><span class="legend-item"><span class="legend-dot" style="background:#5F27CD"></span>Day 6 沈阳</span></div>
+<div class="timeline">
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">10月8日 周四</div><div class="timeline-title">沈阳全天</div><div class="timeline-detail">🍽️ 08:30 早餐<br>📍 09:30 沈阳故宫（2-3小时）<br>🍽️ 12:30 传说鸡架/琴江串店</div><div class="timeline-map" data-points="41.7967,123.4490,沈阳故宫"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">下午</div><div class="timeline-title">历史建筑</div><div class="timeline-detail">📍 14:00 大帅府、总督府<br>📍 16:00 小南教堂<br>📍 17:30 大清宫</div><div class="timeline-map" data-points="41.7980,123.4540,大帅府;41.7950,123.4480,总督府;41.7930,123.4400,小南教堂;41.7900,123.4350,大清宫"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">晚上</div><div class="timeline-title">美食与夜生活</div><div class="timeline-detail">🍽️ 19:00 太白山烤肉<br>📍 21:00 老北市夜逛</div><div class="timeline-map" data-points="41.7950,123.4300,太白山烤肉;41.7920,123.4280,老北市"></div></div>
+</div></div>
+<div class="day-content" id="day7">
+<div id="map-day7"></div>
+<div class="day-legend"><span class="legend-item"><span class="legend-dot" style="background:#EE5A24"></span>Day 7 沈阳→广州</span></div>
+<div class="timeline">
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">10月9日 周五</div><div class="timeline-title">沈阳→广州</div><div class="timeline-detail">🛒 07:30 小河沿早市<br>📍 10:00 辽宁省博（1.5小时）<br>🏨 12:00 退房盛京里·禧漫</div><div class="timeline-map" data-points="41.7900,123.4500,小河沿早市;41.7800,123.4400,辽宁省博;41.8000,123.4400,盛京里·禧漫"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">下午</div><div class="timeline-title">最后采购</div><div class="timeline-detail">🍽️ 12:30 长海参鸡汤/草家酱蟹<br>🛒 14:00 韩百超市</div><div class="timeline-map" data-points="41.7900,123.4100,韩百超市"></div></div>
+<div class="timeline-item" onclick="toggleTimelineMap(this)"><div class="timeline-date">晚上</div><div class="timeline-title">返程</div><div class="timeline-detail">✈️ 19:00 前往桃仙机场<br>✈️ 21:30 MU6340 沈阳→广州<br>✈️ 01:55+1 到达广州</div><div class="timeline-map" data-points="41.6400,123.4800,沈阳桃仙机场"></div></div>
+</div></div>
+</div>
+<div class="section"><div class="section-title">👗 每日出片穿搭</div><div class="outfit-card"><div class="outfit-person"><div class="outfit-name">🐟 小鱼</div><div id="outfit-xiaoyu">清新文艺风</div></div><div class="outfit-person"><div class="outfit-name">🐒 狒狒</div><div id="outfit-feifei">休闲舒适风</div></div></div><button class="btn btn-primary" onclick="openOutfitModal()">✏️ 编辑穿搭</button></div>
+<div class="section"><div class="section-title">⛅ 每日天气</div><div class="weather-card"><div class="weather-icon">🌤️</div><div><div class="weather-temp">18°C</div><div>大连 · Day 1 · 多云转晴</div></div></div><div class="weather-card"><div class="weather-icon">☀️</div><div><div class="weather-temp">20°C</div><div>大连 · Day 2 · 晴</div></div></div><div class="weather-card"><div class="weather-icon">🌤️</div><div><div class="weather-temp">19°C</div><div>大连/丹东 · Day 3 · 多云</div></div></div><div class="weather-card"><div class="weather-icon">☁️</div><div><div class="weather-temp">17°C</div><div>丹东 · Day 4 · 阴</div></div></div><div class="weather-card"><div class="weather-icon">🌧️</div><div><div class="weather-temp">15°C</div><div>丹东/沈阳 · Day 5 · 小雨</div></div></div><div class="weather-card"><div class="weather-icon">☀️</div><div><div class="weather-temp">18°C</div><div>沈阳 · Day 6 · 晴</div></div></div><div class="weather-card"><div class="weather-icon">🌤️</div><div><div class="weather-temp">16°C</div><div>沈阳 · Day 7 · 多云</div></div></div></div>
+<div class="section">
+<div class="section-title">📋 待办清单</div>
+<div style="display:flex;gap:10px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:10px">
+<button class="tab-btn active" id="spots-tab-btn" onclick="showTodoTab('spots')">📍 旅行地点</button>
+<button class="tab-btn" id="food-tab-btn" onclick="showTodoTab('food')">🍽️ 美食待吃</button>
+<button class="tab-btn" id="other-tab-btn" onclick="showTodoTab('other')">📝 其它待办</button>
+</div>
+<div id="spots-tab"><div id="spots-list"></div><div class="todo-input-container"><input type="text" class="todo-input" id="spots-input" placeholder="添加新的地点..."><button class="todo-btn" onclick="addTodo('spots')">添加</button></div><div class="progress-bar"><div class="progress-fill" id="spots-progress"></div></div><div id="spots-progress-text" style="text-align:center;margin-top:5px;font-size:.9em;color:var(--text2)">0% 完成</div></div>
+<div id="food-tab" style="display:none"><div id="food-list"></div><div class="todo-input-container"><input type="text" class="todo-input" id="food-input" placeholder="添加新的美食..."><button class="todo-btn" onclick="addTodo('food')">添加</button></div><div class="progress-bar"><div class="progress-fill" id="food-progress"></div></div><div id="food-progress-text" style="text-align:center;margin-top:5px;font-size:.9em;color:var(--text2)">0% 完成</div></div>
+<div id="other-tab" style="display:none"><div id="other-list"></div><div class="todo-input-container"><input type="text" class="todo-input" id="other-input" placeholder="添加其它待办..."><button class="todo-btn" onclick="addTodo('other')">添加</button></div><div class="progress-bar"><div class="progress-fill" id="other-progress"></div></div><div id="other-progress-text" style="text-align:center;margin-top:5px;font-size:.9em;color:var(--text2)">0% 完成</div></div>
+</div>
+<div class="section">
+<div class="section-title">💰 每日花销</div>
+<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:10px">
+<button class="tab-btn active" id="exp-day1" onclick="showExpenseDay(1)">Day 1</button>
+<button class="tab-btn" id="exp-day2" onclick="showExpenseDay(2)">Day 2</button>
+<button class="tab-btn" id="exp-day3" onclick="showExpenseDay(3)">Day 3</button>
+<button class="tab-btn" id="exp-day4" onclick="showExpenseDay(4)">Day 4</button>
+<button class="tab-btn" id="exp-day5" onclick="showExpenseDay(5)">Day 5</button>
+<button class="tab-btn" id="exp-day6" onclick="showExpenseDay(6)">Day 6</button>
+<button class="tab-btn" id="exp-day7" onclick="showExpenseDay(7)">Day 7</button>
+</div>
+<div id="expense-container"></div>
+<div class="todo-input-container">
+<input type="text" class="todo-input" id="expense-name" placeholder="项目名称" style="flex:2">
+<input type="number" class="todo-input" id="expense-amount" placeholder="金额" style="flex:1">
+<select class="todo-input" id="expense-payer" style="flex:1"><option value="小鱼">小鱼</option><option value="狒狒">狒狒</option><option value="共同">共同</option></select>
+<button class="todo-btn" onclick="addExpense()">添加</button>
+</div>
+<div class="expense-total" id="expense-day-total">当日合计：¥0</div>
+<div class="expense-total" id="expense-grand-total" style="font-size:1.5em">总花销：¥0</div>
+<div style="display:flex;justify-content:space-around;margin-top:15px;padding-top:15px;border-top:2px solid var(--accent2)">
+<div style="text-align:center"><div style="color:var(--accent)">小鱼</div><div id="xiaoyu-total" style="font-size:1.5em;font-weight:bold">¥0</div></div>
+<div style="text-align:center"><div style="color:var(--accent)">狒狒</div><div id="feifei-total" style="font-size:1.5em;font-weight:bold">¥0</div></div>
+</div>
+</div>
+<div class="section">
+<div class="section-title">💡 实用贴士</div>
+<div class="tips-container">
+<div class="tip-card"><div class="tip-title">🌡️ 天气穿衣</div><div>气温约10-20°C，早晚凉。建议长袖外套+薄羽绒服，海边带围巾。</div></div>
+<div class="tip-card"><div class="tip-title">🏨 住宿提醒</div><div>入住14:00后，离店12:00前。提前到可寄存行李。</div></div>
+<div class="tip-card"><div class="tip-title">🚄 交通提示</div><div>高铁票需提前购买，国庆票源紧张。地铁支持支付宝乘车码。</div></div>
+<div class="tip-card"><div class="tip-title">📱 必备APP</div><div>12306、滴滴、大众点评、小红书、高德/苹果地图</div></div>
+<div class="tip-card"><div class="tip-title">🧳 行李清单</div><div>身份证、充电宝、相机、舒适鞋子、外套、雨伞</div></div>
+<div class="tip-card"><div class="tip-title">⚠️ 注意事项</div><div>国庆景点人多，提前预约博物馆。海边注意安全。</div></div>
+</div>
+</div>
+<div class="modal" id="outfit-modal">
+<div class="modal-content">
+<div class="section-title">编辑出片穿搭</div>
+<label>🐟 小鱼穿搭风格</label>
+<input type="text" class="modal-input" id="modal-outfit-xiaoyu">
+<label>🐒 狒狒穿搭风格</label>
+<input type="text" class="modal-input" id="modal-outfit-feifei">
+<div style="display:flex;gap:10px;margin-top:15px">
+<button class="btn btn-secondary" onclick="closeOutfitModal()">取消</button>
+<button class="btn btn-primary" onclick="saveOutfit()">保存</button>
+</div>
+</div>
+</div>
+<script>
+var APP_KEY="travel-liaoning-2026";
+var currentExpenseDay=1;
+var dayRoutes={1:{center:[38.91,121.62],zoom:13,color:"#FF6B6B",points:[{lat:38.914,lng:121.6147,name:"大连周水子机场"},{lat:38.92,lng:121.63,name:"徐园饭店"},{lat:38.92,lng:121.65,name:"东港商务区"},{lat:38.91,lng:121.64,name:"菱角湾"},{lat:38.8884,lng:121.6052,name:"星海广场"},{lat:38.8722,lng:121.5981,name:"跨海大桥"}]},2:{center:[38.915,121.62],zoom:14,color:"#4ECDC4",points:[{lat:38.92,lng:121.63,name:"徐园饭店"},{lat:38.925,lng:121.62,name:"艾尚酒店"},{lat:38.916,lng:121.62,name:"中山广场"},{lat:38.912,lng:121.625,name:"岗东五街"},{lat:38.905,lng:121.63,name:"渔人码头"},{lat:38.92,lng:121.615,name:"品海楼"},{lat:38.918,lng:121.612,name:"大连商场"}]},3:{center:[39.5,122.5],zoom:8,color:"#FFE66D",points:[{lat:38.9,lng:121.59,name:"马栏市场"},{lat:38.88,lng:121.58,name:"银沙滩"},{lat:38.875,lng:121.575,name:"小岗"},{lat:38.925,lng:121.62,name:"艾尚酒店"},{lat:38.93,lng:121.61,name:"大连站"},{lat:40.121,lng:124.3947,name:"丹东站"},{lat:40.118,lng:124.39,name:"银杏园酒店"}]},4:{center:[40.15,124.42],zoom:12,color:"#FF9F43",points:[{lat:40.1152,lng:124.389,name:"鸭绿江断桥"},{lat:40.116,lng:124.39,name:"国门"},{lat:40.117,lng:124.391,name:"一步跨"},{lat:40.232,lng:124.509,name:"虎山长城"},{lat:40.12,lng:124.38,name:"抗美援朝纪念馆"},{lat:40.12,lng:124.385,name:"安东老街"}]},5:{center:[40.8,123.8],zoom:8,color:"#54A0FF",points:[{lat:40.125,lng:124.395,name:"毛岸英学校"},{lat:40.118,lng:124.39,name:"银杏园酒店"},{lat:40.121,lng:124.3947,name:"丹东站"},{lat:41.8057,lng:123.4315,name:"沈阳站"},{lat:41.8,lng:123.44,name:"盛京里·禧漫"},{lat:41.79,lng:123.41,name:"西塔美食街"}]},6:{center:[41.795,123.44],zoom:14,color:"#5F27CD",points:[{lat:41.7967,lng:123.449,name:"沈阳故宫"},{lat:41.798,lng:123.454,name:"大帅府"},{lat:41.795,lng:123.448,name:"总督府"},{lat:41.793,lng:123.44,name:"小南教堂"},{lat:41.79,lng:123.435,name:"大清宫"},{lat:41.795,lng:123.43,name:"太白山烤肉"},{lat:41.792,lng:123.428,name:"老北市"}]},7:{center:[41.75,123.45],zoom:12,color:"#EE5A24",points:[{lat:41.79,lng:123.45,name:"小河沿早市"},{lat:41.78,lng:123.44,name:"辽宁省博"},{lat:41.8,lng:123.44,name:"盛京里·禧漫"},{lat:41.79,lng:123.41,name:"韩百超市"},{lat:41.64,lng:123.48,name:"沈阳桃仙机场"}]}};
+var appData={todos:{spots:[{id:1,text:"黑礁石公园",completed:false},{id:2,text:"星海广场",completed:false},{id:3,text:"跨海大桥",completed:false},{id:4,text:"银沙滩",completed:false},{id:5,text:"付家庄公园",completed:false},{id:6,text:"小岗",completed:false},{id:7,text:"菱角湾",completed:false},{id:8,text:"渔人码头",completed:false},{id:9,text:"中山广场",completed:false},{id:10,text:"岗东五街",completed:false},{id:11,text:"鸭绿江断桥",completed:false},{id:12,text:"国门",completed:false},{id:13,text:"19号界碑",completed:false},{id:14,text:"一步跨",completed:false},{id:15,text:"G228起点",completed:false},{id:16,text:"毛岸英学校",completed:false},{id:17,text:"安东老街",completed:false},{id:18,text:"虎山长城",completed:false},{id:19,text:"抗美援朝纪念馆",completed:false},{id:20,text:"小河沿",completed:false},{id:21,text:"沈阳故宫",completed:false},{id:22,text:"大帅府",completed:false},{id:23,text:"总督府",completed:false},{id:24,text:"中衡",completed:false},{id:25,text:"大清宫",completed:false},{id:26,text:"辽宁省博",completed:false},{id:27,text:"小南教堂",completed:false},{id:28,text:"老北市",completed:false},{id:29,text:"西塔",completed:false}],food:[{id:1,text:"安东汤饭",completed:false},{id:2,text:"韩城谷香",completed:false},{id:3,text:"澳深鱼市（周二四六）",completed:false},{id:4,text:"品海楼/正黄旗（海肠捞饭）",completed:false},{id:5,text:"喜鼎（海胆饺子）",completed:false},{id:6,text:"马栏市场（海胆）",completed:false},{id:7,text:"仙生生/阿水/鱼间日料",completed:false},{id:8,text:"东北灵丹咖啡",completed:false},{id:9,text:"大连商场（炒焖子、鸡架）",completed:false},{id:10,text:"喝丢一只鞋烧烤",completed:false},{id:11,text:"冷面夹臭豆腐",completed:false},{id:12,text:"天福汤饭",completed:false},{id:13,text:"老肥串烧烤",completed:false},{id:14,text:"金刚海鲜烧烤",completed:false},{id:15,text:"东港黄海大市场",completed:false},{id:16,text:"传说鸡架",completed:false},{id:17,text:"琴江串店",completed:false},{id:18,text:"长海参鸡汤",completed:false},{id:19,text:"草家酱蟹",completed:false},{id:20,text:"高力乐",completed:false},{id:21,text:"太白山烤肉",completed:false},{id:22,text:"韩百超市",completed:false}],other:[]},expenses:{1:[],2:[],3:[],4:[],5:[],6:[],7:[]},outfits:{xiaoyu:"清新文艺风",feifei:"休闲舒适风"}};
+function loadData(){var s=localStorage.getItem(APP_KEY);if(s){try{var p=JSON.parse(s);if(p.todos)appData.todos=p.todos;if(p.expenses)appData.expenses=p.expenses;if(p.outfits)appData.outfits=p.outfits}catch(e){}}if(!appData.todos)appData.todos={spots:[],food:[],other:[]};if(!appData.todos.spots)appData.todos.spots=[];if(!appData.todos.food)appData.todos.food=[];if(!appData.todos.other)appData.todos.other=[];if(!appData.expenses)appData.expenses={1:[],2:[],3:[],4:[],5:[],6:[],7:[]};for(var d=1;d<=7;d++){if(!appData.expenses[d])appData.expenses[d]=[]}if(!appData.outfits)appData.outfits={xiaoyu:"清新文艺风",feifei:"休闲舒适风"};renderAll()}
+function saveData(){localStorage.setItem(APP_KEY,JSON.stringify(appData))}
+function updateCountdown(){var d=new Date("2026-10-03T00:00:00"),n=new Date(),diff=d-n,label=document.getElementById("countdown-label");if(diff<=0){var day=Math.floor((n-d)/864e5)+1;label.textContent="已出发！";document.getElementById("days").textContent="Day "+day;document.getElementById("hours").textContent="";document.getElementById("minutes").textContent="";document.getElementById("seconds").textContent=""}else{label.textContent="距离出发还有";document.getElementById("days").textContent=String(Math.floor(diff/864e5)).padStart(2,"0");document.getElementById("hours").textContent=String(Math.floor((diff%864e5)/36e5)).padStart(2,"0");document.getElementById("minutes").textContent=String(Math.floor((diff%36e5)/6e4)).padStart(2,"0");document.getElementById("seconds").textContent=String(Math.floor((diff%6e4)/1e3)).padStart(2,"0")}}
+function updateCurrentTodo(){var all=appData.todos.spots.concat(appData.todos.food,appData.todos.other),first=null;for(var i=0;i<all.length;i++){if(!all[i].completed){first=all[i];break}}document.getElementById("next-todo").textContent=first?first.text:"所有任务已完成！🎉"}
+function renderTodos(type){var list=document.getElementById(type+"-list"),html="",todos=appData.todos[type],total=todos.length,done=0;for(var i=0;i<todos.length;i++){var t=todos[i];if(t.completed)done++;html+="<div class=\"todo-item "+(t.completed?"completed":"")+"\" onclick=\"toggleTodo(\u0027"+type+"\u0027,"+t.id+")\"><div class=\"todo-checkbox\">"+(t.completed?"✓":"")+"</div><span class=\"todo-text\">"+t.text+"</span><span class=\"todo-delete\" onclick=\"event.stopPropagation();deleteTodo(\u0027"+type+"\u0027,"+t.id+")\">✕</span></div>"}list.innerHTML=html;var pct=total?Math.round(done/total*100):0;document.getElementById(type+"-progress").style.width=pct+"%";document.getElementById(type+"-progress-text").textContent=pct+"% 完成"}
+function toggleTodo(type,id){var todos=appData.todos[type];for(var i=0;i<todos.length;i++){if(todos[i].id===id){todos[i].completed=!todos[i].completed;break}}renderTodos(type);updateCurrentTodo();saveData()}
+function deleteTodo(type,id){appData.todos[type]=appData.todos[type].filter(function(x){return x.id!==id});renderTodos(type);updateCurrentTodo();saveData()}
+function addTodo(type){var input=document.getElementById(type+"-input"),text=input.value.trim();if(text){var newId=appData.todos[type].length?Math.max.apply(null,appData.todos[type].map(function(t){return t.id}))+1:1;appData.todos[type].push({id:newId,text:text,completed:false});input.value="";renderTodos(type);updateCurrentTodo();saveData()}}
+function renderExpenses(){var container=document.getElementById("expense-container"),expenses=appData.expenses[currentExpenseDay],html="";for(var i=0;i<expenses.length;i++){var e=expenses[i];html+="<div class=\"expense-item\"><span class=\"expense-name\">"+e.name+"</span><span class=\"expense-amount\">¥"+e.amount+"</span><span class=\"expense-payer\">"+e.payer+"</span><span class=\"todo-delete\" onclick=\"deleteExpense("+i+")\">✕</span></div>"}container.innerHTML=html;var dayTotal=0;for(var i=0;i<expenses.length;i++){dayTotal+=parseFloat(expenses[i].amount||0)}document.getElementById("expense-day-total").textContent="当日合计：¥"+dayTotal.toFixed(2);updateGrandTotal()}
+function addExpense(){var name=document.getElementById("expense-name").value.trim(),amount=parseFloat(document.getElementById("expense-amount").value)||0,payer=document.getElementById("expense-payer").value;if(name&&amount>0){appData.expenses[currentExpenseDay].push({name:name,amount:amount,payer:payer});document.getElementById("expense-name").value="";document.getElementById("expense-amount").value="";renderExpenses();saveData()}}
+function deleteExpense(index){appData.expenses[currentExpenseDay].splice(index,1);renderExpenses();saveData()}
+function updateGrandTotal(){var total=0,xiaoyu=0,feifei=0;for(var d=1;d<=7;d++){var exps=appData.expenses[d];for(var i=0;i<exps.length;i++){var a=parseFloat(exps[i].amount||0);total+=a;if(exps[i].payer==="小鱼")xiaoyu+=a;else if(exps[i].payer==="狒狒")feifei+=a;else{xiaoyu+=a/2;feifei+=a/2}}}document.getElementById("expense-grand-total").textContent="总花销：¥"+total.toFixed(2);document.getElementById("xiaoyu-total").textContent="¥"+xiaoyu.toFixed(2);document.getElementById("feifei-total").textContent="¥"+feifei.toFixed(2)}
+function showDay(day){var days=document.querySelectorAll(".day-content"),btns=document.querySelectorAll(".day-btn");for(var i=0;i<days.length;i++)days[i].classList.remove("active");for(var i=0;i<btns.length;i++)btns[i].classList.remove("active");document.getElementById("day"+day).classList.add("active");btns[day-1].classList.add("active")}
+function toggleTimelineMap(item){var mapDiv=item.querySelector(".timeline-map");if(!mapDiv)return;var points=mapDiv.getAttribute("data-points");if(!points)return;if(mapDiv.classList.contains("show")){mapDiv.classList.remove("show");return}var pointList=points.split(";").map(function(p){var parts=p.split(",");return{lat:parts[0],lng:parts[1],name:parts[2]}});var mapHtml="<div style=\"padding:10px\">";for(var i=0;i<pointList.length;i++){var p=pointList[i];mapHtml+="<span class=\"location-tag\" onclick=\"openNav("+p.lat+","+p.lng+")\">📍 "+p.name+"</span>"}mapHtml+="</div>";mapDiv.innerHTML=mapHtml;mapDiv.classList.add("show")}
+function openNav(lat,lng){window.open("https://maps.apple.com/?q="+lat+","+lng+"&z=15")}
+function renderOutfits(){document.getElementById("outfit-xiaoyu").textContent=appData.outfits.xiaoyu;document.getElementById("outfit-feifei").textContent=appData.outfits.feifei}
+function openOutfitModal(){document.getElementById("modal-outfit-xiaoyu").value=appData.outfits.xiaoyu;document.getElementById("modal-outfit-feifei").value=appData.outfits.feifei;document.getElementById("outfit-modal").style.display="flex"}
+function closeOutfitModal(){document.getElementById("outfit-modal").style.display="none"}
+function saveOutfit(){appData.outfits.xiaoyu=document.getElementById("modal-outfit-xiaoyu").value;appData.outfits.feifei=document.getElementById("modal-outfit-feifei").value;renderOutfits();closeOutfitModal();saveData()}
+function showTodoTab(tab){document.getElementById("spots-tab").style.display=tab==="spots"?"block":"none";document.getElementById("food-tab").style.display=tab==="food"?"block":"none";document.getElementById("other-tab").style.display=tab==="other"?"block":"none";document.getElementById("spots-tab-btn").className=tab==="spots"?"tab-btn active":"tab-btn";document.getElementById("food-tab-btn").className=tab==="food"?"tab-btn active":"tab-btn";document.getElementById("other-tab-btn").className=tab==="other"?"tab-btn active":"tab-btn"}
+function showExpenseDay(day){currentExpenseDay=day;for(var i=1;i<=7;i++){document.getElementById("exp-day"+i).className=i===day?"tab-btn active":"tab-btn"}renderExpenses()}
+function checkTheme(){var h=new Date().getHours();if(h>=18||h<6){document.documentElement.setAttribute("data-theme","dark")}else{document.documentElement.removeAttribute("data-theme")}}
+function initMap(day){var container=document.getElementById("map-day"+day);if(!container)return;var route=dayRoutes[day];if(!route)return;var html="<div style=\"padding:15px;background:linear-gradient(135deg,#e0f7fa,#b2ebf2);border-radius:10px;text-align:center\"><div style=\"font-size:1.2em;font-weight:bold;margin-bottom:10px;color:"+route.color+"\">📍 "+route.points.length+"个地点</div>";for(var i=0;i<route.points.length;i++){var p=route.points[i];html+="<span style=\"display:inline-block;padding:6px 12px;margin:4px;background:"+route.color+";color:white;border-radius:20px;font-size:.9em;cursor:pointer\" onclick=\"openNav("+p.lat+","+p.lng+")\">"+(i+1)+"."+p.name+"</span>"};html+="<div style=\"margin-top:10px\"><a href=\"https://maps.apple.com/?q="+route.points[0].lat+","+route.points[0].lng+"&z=12\" target=\"_blank\" style=\"color:"+route.color+";font-weight:bold\">🍎 在苹果地图中查看全部地点</a></div></div>";container.innerHTML=html}
+function initMaps(){for(var day=1;day<=7;day++){initMap(day)}}
+function renderAll(){renderTodos("spots");renderTodos("food");renderTodos("other");renderExpenses();renderOutfits();updateCurrentTodo();updateGrandTotal()}
+function init(){loadData();checkTheme();updateCountdown();setInterval(updateCountdown,1000);setInterval(checkTheme,60000);window.onclick=function(e){if(e.target.classList.contains("modal"))e.target.style.display="none"};document.getElementById("spots-input").addEventListener("keypress",function(e){if(e.key==="Enter")addTodo("spots")});document.getElementById("food-input").addEventListener("keypress",function(e){if(e.key==="Enter")addTodo("food")});document.getElementById("other-input").addEventListener("keypress",function(e){if(e.key==="Enter")addTodo("other")})}
+init();initMaps();
+</script>
+</body>
+</html>
+
